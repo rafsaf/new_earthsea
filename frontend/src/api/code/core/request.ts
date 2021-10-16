@@ -1,9 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import FormData from 'form-data';
-
 import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
@@ -21,8 +18,8 @@ function isStringWithValue(value: any): value is string {
     return isString(value) && value !== '';
 }
 
-function isSuccess(status: number): boolean {
-    return status >= 200 && status < 300;
+function isBlob(value: any): value is Blob {
+    return value instanceof Blob;
 }
 
 function base64(str: string): string {
@@ -82,52 +79,79 @@ async function resolve<T>(options: ApiRequestOptions, resolver?: T | Resolver<T>
     return resolver;
 }
 
-async function getHeaders(options: ApiRequestOptions, formData?: FormData): Promise<Record<string, string>> {
+async function getHeaders(options: ApiRequestOptions): Promise<Headers> {
     const token = await resolve(options, OpenAPI.TOKEN);
     const username = await resolve(options, OpenAPI.USERNAME);
     const password = await resolve(options, OpenAPI.PASSWORD);
     const additionalHeaders = await resolve(options, OpenAPI.HEADERS);
-    const formHeaders = typeof formData?.getHeaders === 'function' && formData?.getHeaders() || {}
 
-    const headers = Object.entries({
+    const defaultHeaders = Object.entries({
         Accept: 'application/json',
         ...additionalHeaders,
         ...options.headers,
-        ...formHeaders,
     })
-    .filter(([key, value]) => isDefined(value))
-    .reduce((headers, [key, value]) => ({
-        ...headers,
-        [key]: value,
-    }), {} as Record<string, string>);
+        .filter(([key, value]) => isDefined(value))
+        .reduce((headers, [key, value]) => ({
+            ...headers,
+            [key]: value,
+        }), {});
+
+    const headers = new Headers(defaultHeaders);
 
     if (isStringWithValue(token)) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers.append('Authorization', `Bearer ${token}`);
     }
 
     if (isStringWithValue(username) && isStringWithValue(password)) {
         const credentials = base64(`${username}:${password}`);
-        headers['Authorization'] = `Basic ${credentials}`;
+        headers.append('Authorization', `Basic ${credentials}`);
     }
 
+    if (options.body) {
+        if (options.mediaType) {
+            headers.append('Content-Type', options.mediaType);
+        } else if (isBlob(options.body)) {
+            headers.append('Content-Type', options.body.type || 'application/octet-stream');
+        } else if (isString(options.body)) {
+            headers.append('Content-Type', 'text/plain');
+        } else {
+            headers.append('Content-Type', 'application/json');
+        }
+    }
     return headers;
 }
 
-async function sendRequest(options: ApiRequestOptions, url: string): Promise<AxiosResponse<any>> {
-    const formData = options.formData && getFormData(options.formData);
-    const data = formData || options.body;
-    const config: AxiosRequestConfig = {
-        url,
-        data,
-        method: options.method,
-        headers: await getHeaders(options, formData),
-    };
-    return await axios.request(config);
+function getRequestBody(options: ApiRequestOptions): BodyInit | undefined {
+    if (options.formData) {
+        return getFormData(options.formData);
+    }
+    if (options.body) {
+        if (options.mediaType?.includes('/json')) {
+            return JSON.stringify(options.body)
+        } else if (isString(options.body) || isBlob(options.body)) {
+            return options.body;
+        } else {
+            return JSON.stringify(options.body);
+        }
+    }
+    return undefined;
 }
 
-function getResponseHeader(response: AxiosResponse<any>, responseHeader?: string): string | null {
+async function sendRequest(options: ApiRequestOptions, url: string): Promise<Response> {
+    const request: RequestInit = {
+        method: options.method,
+        headers: await getHeaders(options),
+        body: getRequestBody(options),
+    };
+    if (OpenAPI.WITH_CREDENTIALS) {
+        request.credentials = 'include';
+    }
+    return await fetch(url, request);
+}
+
+function getResponseHeader(response: Response, responseHeader?: string): string | null {
     if (responseHeader) {
-        const content = response.headers[responseHeader];
+        const content = response.headers.get(responseHeader);
         if (isString(content)) {
             return content;
         }
@@ -135,9 +159,21 @@ function getResponseHeader(response: AxiosResponse<any>, responseHeader?: string
     return null;
 }
 
-function getResponseBody(response: AxiosResponse<any>): any {
+async function getResponseBody(response: Response): Promise<any> {
     if (response.status !== 204) {
-        return response.data;
+        try {
+            const contentType = response.headers.get('Content-Type');
+            if (contentType) {
+                const isJSON = contentType.toLowerCase().startsWith('application/json');
+                if (isJSON) {
+                    return await response.json();
+                } else {
+                    return await response.text();
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
     return null;
 }
@@ -165,7 +201,7 @@ function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
 }
 
 /**
- * Request using axios client
+ * Request using fetch client
  * @param options The request options from the the service
  * @returns ApiResult
  * @throws ApiError
@@ -173,12 +209,12 @@ function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
 export async function request(options: ApiRequestOptions): Promise<ApiResult> {
     const url = getUrl(options);
     const response = await sendRequest(options, url);
-    const responseBody = getResponseBody(response);
+    const responseBody = await getResponseBody(response);
     const responseHeader = getResponseHeader(response, options.responseHeader);
 
     const result: ApiResult = {
         url,
-        ok: isSuccess(response.status),
+        ok: response.ok,
         status: response.status,
         statusText: response.statusText,
         body: responseHeader || responseBody,
