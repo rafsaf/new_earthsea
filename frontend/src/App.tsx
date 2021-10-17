@@ -11,6 +11,9 @@ import {
 } from "react-router-dom";
 import Login from "./pages/login";
 import AddContent from "./pages/AddContent";
+import Layout from "./components/Layout";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 type Props = {
   children?: React.ReactChild | React.ReactChild[];
@@ -40,19 +43,23 @@ function PrivateRoute({ children, ...rest }: Props) {
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <Router>
-        <Switch>
-          <Route path="/login">
-            <Login />
-          </Route>
-          <PrivateRoute path="/add">
-            <AddContent />
-          </PrivateRoute>
-          <Route path="/">
-            <Index />
-          </Route>
-        </Switch>
+        <Header />
+        <Layout>
+          <Switch>
+            <Route path="/login">
+              <Login />
+            </Route>
+            <PrivateRoute path="/add">
+              <AddContent />
+            </PrivateRoute>
+            <Route path="/">
+              <Index />
+            </Route>
+          </Switch>
+        </Layout>
+        <Footer />
       </Router>
     </div>
   );
