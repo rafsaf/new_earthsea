@@ -9,8 +9,10 @@
     "@types/jest": "^26.0.24",
     "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.9",
+    "@uiw/react-md-editor": "^3.6.5",
     "axios": "^0.23.0",
     "axios-auth-refresh": "^3.2.1",
+    "draft-js": "^0.11.7",
     "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -44,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@types/draft-js": "^0.11.6",
     "@types/node": "^16.11.0",
     "@types/react-router-dom": "^5.3.1",
     "openapi-typescript-codegen": "^0.10.0-alpha"
