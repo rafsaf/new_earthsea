@@ -10,6 +10,14 @@ class ContentBase(BaseModel):
 
     class Config:
         orm_mode = True
+        schema_extra = {
+            "example": {
+                "id": "Gont",
+                "desc": "Jedna z wysp Ziemiomorza",
+                "categories": "Gont;Wyspa;Ziemiomorze",
+                "content": "## Gont **to wielka wyspa**",
+            }
+        }
 
 
 class ContentCreate(BaseModel):
@@ -38,3 +46,11 @@ class ContentUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+        schema_extra = {
+            "example": {
+                "id": "Gont",
+                "desc": "Jedna z wysp Ziemiomorza",
+                "categories": "Gont;Wyspa;Ziemiomorze",
+                "content": "## Gont **to wielka wyspa**",
+            }
+        }
