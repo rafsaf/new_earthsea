@@ -1,33 +1,29 @@
-from typing import Generator
+from typing import AsyncGenerator, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import crud, models, schemas
+from app import schemas
 from app.core import security
 from app.core.config import settings
-from app.db.session import SessionLocal
+from app.models import User
+from app.session import async_session
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_STR}/login/access-token"
-)
-
-
-def get_db() -> Generator:
-    try:
-        db: Session = SessionLocal()
-        yield db
-    except:
-        raise Exception
-    db.close()
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_STR}/auth/access-token")
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
-) -> models.User:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
+
+
+async def get_current_user(
+    session: AsyncSession = Depends(get_session), token: str = Depends(reusable_oauth2)
+) -> User:
 
     try:
         payload = jwt.decode(
@@ -39,13 +35,16 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud.user.get(db, id=token_data.sub)
+
+    result = await session.execute(select(User).where(User.id == token_data.sub))
+    user: Optional[User] = result.scalars().first()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
-def get_current_active_user(
-    current_user: models.User = Depends(get_current_user),
-) -> models.User:
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
     return current_user

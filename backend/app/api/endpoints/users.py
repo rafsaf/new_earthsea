@@ -1,43 +1,41 @@
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends
-from fastapi.encoders import jsonable_encoder
-from pydantic.networks import EmailStr
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import crud, models, schemas
+from app import models, schemas
 from app.api import deps
+from app.core.security import get_password_hash
 
 router = APIRouter()
 
 
 @router.put("/me", response_model=schemas.User)
-def update_user_me(
-    *,
-    db: Session = Depends(deps.get_db),
-    password: str = Body(None),
-    full_name: str = Body(None),
-    email: EmailStr = Body(None),
+async def update_user_me(
+    user_update: schemas.UserUpdate,
+    session: AsyncSession = Depends(deps.get_session),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Update own user.
+    Update current user.
     """
-    current_user_data = jsonable_encoder(current_user)
-    user_in = schemas.UserUpdate(**current_user_data)
-    if password is not None:
-        user_in.password = password
-    if full_name is not None:
-        user_in.full_name = full_name
-    if email is not None:
-        user_in.email = email
-    user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
-    return user
+    if user_update.password is not None:
+        current_user.hashed_password = get_password_hash(user_update.password)
+    if user_update.full_name is not None:
+        current_user.full_name = user_update.full_name
+    if user_update.email is not None:
+        current_user.email = user_update.email
+
+    session.add(current_user)
+    await session.commit()
+    await session.refresh(current_user)
+
+    return current_user
 
 
 @router.get("/me", response_model=schemas.User)
-def read_user_me(
-    db: Session = Depends(deps.get_db),
+async def read_user_me(
+    session: AsyncSession = Depends(deps.get_session),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
