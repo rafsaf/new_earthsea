@@ -9,7 +9,7 @@ environ["POSTGRES_USER"] = "tests"
 environ["POSTGRES_PASSWORD"] = "tests"
 environ["POSTGRES_DB"] = "tests"
 environ["POSTGRES_HOST"] = getenv("TESTS_POSTGRES_DB_HOST") or "localhost"
-environ["POSTGRES_PORT"] = "37645"
+environ["POSTGRES_PORT"] = "37650"
 
 import asyncio
 from typing import AsyncGenerator

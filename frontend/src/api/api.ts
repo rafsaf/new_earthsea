@@ -57,3 +57,7 @@ instance.interceptors.request.use(
 );
 
 export default instance;
+
+export const logOut = () => {
+  localStorage.removeItem("jwt-token");
+};

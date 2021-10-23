@@ -31,4 +31,4 @@ services:
       - POSTGRES_USER=tests
       - POSTGRES_PASSWORD=tests
     ports:
-      - "37645:5432"
+      - "37650:5432"

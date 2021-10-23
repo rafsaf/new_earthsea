@@ -1,7 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { logOut } from "../api/api";
+import { useHistory, useLocation } from "react-router-dom";
 
 const Footer = () => {
+  const [loggedIn, setLoggedIn] = React.useState<boolean>(
+    localStorage.getItem("jwt-token") !== null
+  );
+  let history = useHistory();
+  const handleLogOut = () => {
+    logOut();
+    setLoggedIn(false);
+    history.replace("/");
+  };
   return (
     <footer className="site-footer">
       <div className="wrapper">
@@ -34,6 +45,11 @@ const Footer = () => {
               <li>
                 <Link to="/add">Dodawanie zawartości</Link>
               </li>
+              {loggedIn ? (
+                <li>
+                  <button onClick={handleLogOut}>Wyloguj</button>
+                </li>
+              ) : null}
             </ul>
           </div>
 

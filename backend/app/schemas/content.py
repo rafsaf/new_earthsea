@@ -3,6 +3,20 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class ContentShort(BaseModel):
+    id: str
+    desc: str
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "id": "Krogulec",
+                "desc": "Arcymag Ziemiomorza, czarnoksiężnik Ged, pochodzący z wyspy Gont",
+            }
+        }
+
+
 class ContentBase(BaseModel):
     id: str = Field(..., max_length=96)
     desc: str = Field(..., max_length=116)
@@ -21,22 +35,8 @@ class ContentBase(BaseModel):
         }
 
 
-class ContentCreate(BaseModel):
-    id: str = Field(..., max_length=96)
-    desc: str = Field(..., max_length=116)
-    categories: str = Field(..., max_length=1024)
-    content: str = Field(..., max_length=50000)
-
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "id": "Krogulec",
-                "desc": "Główny bohater serii, czarnoksiężnik o prawdziwym imieniu Ged, Władca Smoków, Arcymag",
-                "categories": "Postać;Arcymag;Bohater;Ged;Krogulec;Jastrząb;Sokół;Gont",
-                "content": "# Ged (md content)",
-            },
-        }
+class ContentCreate(ContentBase):
+    pass
 
 
 class ContentUpdate(BaseModel):
