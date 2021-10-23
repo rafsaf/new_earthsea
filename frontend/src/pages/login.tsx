@@ -27,7 +27,7 @@ const Login = () => {
           form.append("username", values.username);
           form.append("password", values.password);
           instance
-            .post<Token>("/login/access-token", form, {
+            .post<Token>("/auth/access-token", form, {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
               },
@@ -48,7 +48,7 @@ const Login = () => {
           <br />
           <label htmlFor="password"></label>
           <br />
-          <Field id="password" name="password" placeholder="password" />
+          <Field id="password" name="password" type="password" placeholder="password" />
           <br />
           <br />
           <button type="submit">Submit</button>
