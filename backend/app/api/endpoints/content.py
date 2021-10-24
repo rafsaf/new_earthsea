@@ -1,13 +1,12 @@
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Response
-from sqlalchemy import delete, select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
 from app.api import deps
 from app.models import Content, User
-from time import time
 
 router = APIRouter()
 
