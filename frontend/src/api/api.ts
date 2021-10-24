@@ -14,7 +14,6 @@ const instance = axios.create({
 const getBearerToken = (): string | null => {
   // THIS RUNS ON EVERY REQUEST
   // fetch token from localStorage
-  console.log("hello");
   const tokenOrNull = localStorage.getItem("jwt-token");
   // if fetched
   if (tokenOrNull) {
@@ -40,7 +39,6 @@ instance.interceptors.request.use(
   (config) => {
     // Do something before request is sent
     const token = getBearerToken();
-    console.log(config);
     if (token !== null) {
       if (config.headers !== undefined) {
         config.headers["Authorization"] = token;
