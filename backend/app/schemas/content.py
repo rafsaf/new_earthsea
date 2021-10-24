@@ -40,7 +40,6 @@ class ContentCreate(ContentBase):
 
 
 class ContentUpdate(BaseModel):
-    id: Optional[str] = Field(max_length=96, default=None)
     desc: Optional[str] = Field(max_length=116, default=None)
     categories: Optional[str] = Field(max_length=1024, default=None)
     content: Optional[str] = Field(max_length=50000, default=None)

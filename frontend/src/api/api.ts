@@ -1,9 +1,7 @@
 import axios from "axios";
 import { Token } from "./models/Token";
 
-const BASE_API_URL = process.env.REACT_APP_SERVICE_URL
-  ? process.env.REACT_APP_SERVICE_URL
-  : "http://localhost:8000";
+export const BASE_API_URL = process.env.REACT_APP_API_LINK;
 
 const instance = axios.create({
   baseURL: BASE_API_URL,

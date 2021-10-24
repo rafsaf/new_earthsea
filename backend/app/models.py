@@ -17,7 +17,7 @@ class User(Base):
 class Content(Base):
     __tablename__ = "content"
 
-    id = Column(String(96), primary_key=True, index=True)
-    desc = Column(String(116), index=True, nullable=False)
-    categories = Column(String(1024), index=True, nullable=False)
-    content = Column(String(50000), nullable=False)
+    id = cast(str, Column(String(96), primary_key=True, index=True))
+    desc = cast(str, Column(String(116), index=True, nullable=False))
+    categories = cast(str, Column(String(1024), index=True, nullable=False))
+    content = cast(str, Column(String(50000), nullable=False))

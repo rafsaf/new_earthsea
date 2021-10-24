@@ -1,0 +1,27 @@
+name: Push docker image to registry
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  push_image_to_registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build frontend --tag rafsaf/earthsea-frontend:latest
+          docker build backend  --tag rafsaf/earthsea-backend:latest
+      - name: Log into registry
+        run: |
+          echo "${{ secrets.DOCKER_PASS }}" | docker login https://registry.rafsaf.pl \
+           -u ${{ secrets.DOCKER_USER }} --password-stdin
+      - name: Push image
+        run: |
+          docker image tag rafsaf/earthsea-frontend:latest registry.rafsaf.pl/rafsaf/earthsea-frontend:latest
+          docker image push registry.rafsaf.pl/rafsaf/earthsea-frontend:latest
+          docker image tag rafsaf/earthsea-backend:latest registry.rafsaf.pl/rafsaf/earthsea-backend:latest
+          docker image push registry.rafsaf.pl/rafsaf/earthsea-backend:latest

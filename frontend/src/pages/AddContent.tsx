@@ -72,7 +72,7 @@ function MyEditor() {
                 successCreate = true;
               })
               .catch((error) => {
-                setMessage(JSON.stringify(error));
+                setMessage(JSON.stringify(error.message));
                 successCreate = false;
               });
 

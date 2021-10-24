@@ -10,7 +10,7 @@ const Header = () => {
         </Link>
         <nav className="site-nav">
           <div className="trigger">
-            <Link to="/about">About</Link>
+            <Link to="/about"></Link>
           </div>
         </nav>
       </div>

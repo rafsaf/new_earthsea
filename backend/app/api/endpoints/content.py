@@ -7,11 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import schemas
 from app.api import deps
 from app.models import Content, User
+from time import time
 
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.ContentBase)
+@router.post("/", response_model=schemas.ContentBase, status_code=201)
 async def create_content(
     content_create: schemas.ContentCreate,
     session: AsyncSession = Depends(deps.get_session),
@@ -42,7 +43,6 @@ async def get_short_contents(
     offset: int = 0,
     limit: int = 25,
     session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get all contents.
@@ -52,9 +52,9 @@ async def get_short_contents(
     Retrun `total-count` header with number of all objects
     """
     stmt_count = select(func.count(Content.id)).where(
-        Content.id.ilike(f"%{ilike}%")
-        | Content.desc.ilike(f"%{ilike}%")
-        | Content.categories.ilike(f"%{ilike}%")
+        Content.id.ilike(f"%{ilike}%")  # type: ignore
+        | Content.desc.ilike(f"%{ilike}%")  # type: ignore
+        | Content.categories.ilike(f"%{ilike}%")  # type: ignore
     )
     count_result = await session.execute(stmt_count)
     count: int = count_result.scalars().one()
@@ -63,9 +63,9 @@ async def get_short_contents(
     stmt = (
         select(Content)
         .where(
-            Content.id.ilike(f"%{ilike}%")
-            | Content.desc.ilike(f"%{ilike}%")
-            | Content.categories.ilike(f"%{ilike}%")
+            Content.id.ilike(f"%{ilike}%")  # type: ignore
+            | Content.desc.ilike(f"%{ilike}%")  # type: ignore
+            | Content.categories.ilike(f"%{ilike}%")  # type: ignore
         )
         .limit(limit)
         .offset(offset)
@@ -80,7 +80,6 @@ async def get_short_contents(
 async def get_single_content(
     content_id: str,
     session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get content with all fields.
@@ -108,4 +107,32 @@ async def delete_content(
     if content is None:
         raise HTTPException(404, "Content with this title does not exist")
     else:
-        await session.execute(delete(Content).where(Content.id == content_id))
+        await session.delete(content)
+
+
+@router.put("/{content_id}", response_model=schemas.ContentBase, status_code=200)
+async def update_content(
+    content_id: str,
+    update_content: schemas.ContentUpdate,
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Update content.
+    """
+
+    result = await session.execute(select(Content).where(Content.id == content_id))
+    content: Optional[Content] = result.scalars().first()
+    if content is None:
+        raise HTTPException(404, "Content with this title does not exist")
+    else:
+        if update_content.content:
+            content.content = update_content.content
+        if update_content.categories:
+            content.categories = update_content.categories
+        if update_content.desc:
+            content.desc = update_content.desc
+        session.add(content)
+        await session.commit()
+        await session.refresh(content)
+        return content

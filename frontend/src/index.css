@@ -196,3 +196,14 @@ h6 {
     width: calc(100% - (30px / 2));
   }
 }
+
+.index-input {
+  width: 90%;
+  height: 2.5rem;
+  margin: 1rem 0;
+  font-size: 13pt;
+}
+.total-count {
+  width: 90%;
+  text-align: end;
+}

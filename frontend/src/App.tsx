@@ -14,6 +14,7 @@ import AddContent from "./pages/AddContent";
 import Layout from "./components/Layout";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Article from "./pages/Article";
 
 type Props = {
   children?: React.ReactChild | React.ReactChild[];
@@ -50,6 +51,9 @@ function App() {
           <Switch>
             <Route path="/login">
               <Login />
+            </Route>
+            <Route path="/-/:title">
+              <Article />
             </Route>
             <PrivateRoute path="/add">
               <AddContent />

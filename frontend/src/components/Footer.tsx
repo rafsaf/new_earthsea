@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { logOut } from "../api/api";
 import { useHistory, useLocation } from "react-router-dom";
+import { BASE_API_URL } from "../api/api";
 
 const Footer = () => {
   const [loggedIn, setLoggedIn] = React.useState<boolean>(
@@ -13,6 +14,7 @@ const Footer = () => {
     setLoggedIn(false);
     history.replace("/");
   };
+
   return (
     <footer className="site-footer">
       <div className="wrapper">
@@ -23,7 +25,11 @@ const Footer = () => {
             <ul className="contact-list">
               <li>Kontakt</li>
               <li>
-                <a href="mailto:rafal.safin@rafsaf.pl" target="_blank">
+                <a
+                  href="mailto:rafal.safin@rafsaf.pl"
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   rafal.safin@rafsaf.pl
                 </a>
               </li>
@@ -38,12 +44,18 @@ const Footer = () => {
                 <a
                   href="https://github.com/rafsaf/new_earthsea"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Projekt na Githubie
                 </a>
               </li>
               <li>
                 <Link to="/add">Dodawanie zawartości</Link>
+              </li>
+              <li>
+                <a target="_blank" rel="noreferrer" href={BASE_API_URL}>
+                  Link to REST API
+                </a>
               </li>
               {loggedIn ? (
                 <li>
