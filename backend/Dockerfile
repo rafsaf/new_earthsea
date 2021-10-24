@@ -4,6 +4,8 @@ FROM nginx/unit:1.25.0-python3.9
 # See https://hub.docker.com/r/nginx/unit/
 ENV PYTHONUNBUFFERED 1
 
+RUN chmod +x init.sh
+
 COPY ./init.sh /docker-entrypoint.d/initial.sh
 COPY ./config/config.json /docker-entrypoint.d/config.json
 
