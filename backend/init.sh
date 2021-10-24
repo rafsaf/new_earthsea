@@ -1,7 +1,7 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 # Run migrations
-alembic upgrade head
+python -m alembic upgrade head
 
 # Create initial data in DB
 python -m app.initial_data
