@@ -1,11 +1,23 @@
 ## Local developemnt
 
 ```bash
+git clone https://github.com/rafsaf/new_earthsea.git
+cd new_earthsea
+
 # in 1st terminal window
 cd backend
-poetry install
-docker-compose -f docker-compose.dev.yml up -d
-bash prestart.sh
+poetry install 
+# and activate environment
 
+cp .env.example .env
+# change something if u want
+
+docker-compose up -d
+bash init.sh
 uvicorn app.main:app --reload
+
+# in 2nd terminal window
+cd frontend
+npm install
+npm start
 ```
