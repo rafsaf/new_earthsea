@@ -4,7 +4,7 @@ FROM nginx/unit:1.25.0-python3.9
 # See https://hub.docker.com/r/nginx/unit/
 ENV PYTHONUNBUFFERED 1
 
-COPY ./app/initial.sh /docker-entrypoint.d/initial.sh
+COPY ./init.sh /docker-entrypoint.d/initial.sh
 COPY ./config/config.json /docker-entrypoint.d/config.json
 
 RUN mkdir build
