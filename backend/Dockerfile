@@ -15,6 +15,7 @@ RUN mkdir build
 WORKDIR /build
 
 COPY ./app ./app
+COPY ./alembic ./alembic
 COPY ./alembic.ini .
 COPY ./requirements.txt .
 

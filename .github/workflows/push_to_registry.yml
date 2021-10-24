@@ -25,3 +25,10 @@ jobs:
           docker image push registry.rafsaf.pl/rafsaf/earthsea-frontend:latest
           docker image tag rafsaf/earthsea-backend:latest registry.rafsaf.pl/rafsaf/earthsea-backend:latest
           docker image push registry.rafsaf.pl/rafsaf/earthsea-backend:latest
+      - name: Force existing deployment to download latest image
+        uses: steebchen/kubectl@v2.0.0
+        with:
+          config: ${{ secrets.KUBECONFIG }}
+          command: |
+            rollout restart deployment earthsea-app -n earthsea
+            rollout restart deployment earthsea-frontend -n earthsea

@@ -61,7 +61,7 @@ function MyEditor() {
 
             let successCreate;
             await instance
-              .post<ContentBase>("/content", {
+              .post<ContentBase>("/content/", {
                 id: values.title,
                 desc: values.description,
                 categories: values.categories,

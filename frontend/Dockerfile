@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:16 as builder
 WORKDIR /opt/frontend
 COPY package.json .
 COPY package-lock.json .
@@ -8,4 +8,6 @@ COPY . .
 RUN npm run build
 
 FROM nginx:alpine
-COPY --from=0 opt/frontend/build /usr/share/nginx/html
+RUN rm -rf /etc/nginx/conf.d
+COPY conf /etc/nginx
+COPY --from=builder opt/frontend/build /usr/share/nginx/html

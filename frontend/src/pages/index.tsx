@@ -25,7 +25,7 @@ const Index = () => {
         setArticles(res.data);
         setCount(res.headers["total-count"]);
       })
-      .catch((error) => setMessage(JSON.stringify(error)));
+      .catch((error) => setMessage(error.message));
   }, [input, offset, limit]);
 
   return (
