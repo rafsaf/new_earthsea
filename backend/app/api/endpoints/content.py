@@ -107,6 +107,7 @@ async def delete_content(
         raise HTTPException(404, "Content with this title does not exist")
     else:
         await session.delete(content)
+        await session.commit()
 
 
 @router.put("/{content_id}", response_model=schemas.ContentBase, status_code=200)

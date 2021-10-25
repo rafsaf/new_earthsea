@@ -1,6 +1,9 @@
 name: Push docker image to registry and redeploy
 
 on:
+  push:
+    branches:
+      - main
   release:
     types:
       - created
