@@ -18,6 +18,6 @@ class Content(Base):
     __tablename__ = "content"
 
     id = cast(str, Column(String(96), primary_key=True, index=True))
-    desc = cast(str, Column(String(116), index=True, nullable=False))
+    desc = cast(str, Column(String(200), index=True, nullable=False))
     categories = cast(str, Column(String(1024), index=True, nullable=False))
     content = cast(str, Column(String(50000), nullable=False))

@@ -19,7 +19,7 @@ class ContentShort(BaseModel):
 
 class ContentBase(BaseModel):
     id: str = Field(..., max_length=96)
-    desc: str = Field(..., max_length=116)
+    desc: str = Field(..., max_length=200)
     categories: str = Field(..., max_length=1024)
     content: str = Field(..., max_length=50000)
 
@@ -40,7 +40,7 @@ class ContentCreate(ContentBase):
 
 
 class ContentUpdate(BaseModel):
-    desc: Optional[str] = Field(max_length=116, default=None)
+    desc: Optional[str] = Field(max_length=200, default=None)
     categories: Optional[str] = Field(max_length=1024, default=None)
     content: Optional[str] = Field(max_length=50000, default=None)
 
