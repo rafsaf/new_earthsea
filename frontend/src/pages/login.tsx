@@ -41,14 +41,19 @@ const Login = () => {
       >
         <Form>
           <br />
-          {message}
+          <div data-testid="error">{message}</div>
           <label htmlFor="username"></label>
           <br />
           <Field id="username" name="username" placeholder="username" />
           <br />
           <label htmlFor="password"></label>
           <br />
-          <Field id="password" name="password" type="password" placeholder="password" />
+          <Field
+            id="password"
+            name="password"
+            type="password"
+            placeholder="password"
+          />
           <br />
           <br />
           <button type="submit">Submit</button>
