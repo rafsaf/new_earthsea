@@ -1,12 +1,12 @@
 import axios from "axios";
 import { Token } from "./models/Token";
-import useLocalStorage from "./utils/useLocalStorage";
+
 
 export const BASE_API_URL = process.env.REACT_APP_API_LINK;
 
 const instance = axios.create({
   baseURL: BASE_API_URL,
-  timeout: 1000,
+  timeout: 2000,
   headers: {
     "Content-Type": "application/json"
   }
@@ -21,15 +21,17 @@ const getBearerToken = (): string | null => {
     const token: Token = JSON.parse(tokenOrNull);
     // if not valid fetch new and save it to localStoarge
     if (new Date() > new Date(token.expire_at)) {
-      instance
+      localStorage.removeItem("jwt-token");
+      axios
         .post<Token>(`${BASE_API_URL}/refresh-token`, {
           refresh_token: token.refresh_token
         })
         .then((res) => {
           localStorage.setItem("jwt-token", JSON.stringify(res.data));
           return `Bearer ${res.data.access_token}`;
-        });
-      // else we just return current token
+        }).catch(err => {
+          localStorage.removeItem("jwt-token");
+        })
     }
     return `Bearer ${token.access_token}`;
   }
@@ -55,6 +57,3 @@ instance.interceptors.request.use(
 
 export default instance;
 
-export const logOut = () => {
-  localStorage.removeItem("jwt-token");
-};

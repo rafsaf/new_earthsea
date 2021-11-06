@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import instance from "../api/api";
 import { Token } from "../api/models/Token";
 import { useHistory, useLocation } from "react-router-dom";
 import { ContentBase } from "../api/models/ContentBase";
 import MDEditor from "@uiw/react-md-editor";
+import useLocalStorage from "../components/utils/useLocalStorage";
+import SettingsContext from "../components/utils/settingsContext";
 
 const Article = () => {
   const [newContent, setNewContent] = useState<string | undefined>("");
   const [message, setMessage] = useState<string>("");
   const [content, setContent] = useState<null | ContentBase>(null);
+  const { isLoggedIn } = useContext(SettingsContext);
+
   const updateArticle = () => {
     instance
       .put<ContentBase>(`/content/${title}`, { content: newContent })
@@ -19,7 +23,6 @@ const Article = () => {
         setMessage(error.message);
       });
   };
-  let history = useHistory();
   let location = useLocation();
   const title = location.pathname.slice(3);
   useEffect(() => {
@@ -42,7 +45,7 @@ const Article = () => {
             style={{
               color: "blue",
               marginBottom: "1rem",
-              textDecoration: "underline",
+              textDecoration: "underline"
             }}
           >
             {content.id}
@@ -53,7 +56,7 @@ const Article = () => {
       ) : (
         "..."
       )}
-      {localStorage.getItem("jwt-token") !== null ? (
+      {isLoggedIn() ? (
         <>
           <div style={{ marginTop: "10rem" }}></div>
           <MDEditor value={newContent} onChange={setNewContent} />

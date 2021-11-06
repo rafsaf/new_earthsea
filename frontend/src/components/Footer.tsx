@@ -1,17 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { logOut } from "../api/api";
 import { useHistory, useLocation } from "react-router-dom";
 import { BASE_API_URL } from "../api/api";
+import SettingsContext from "./utils/settingsContext";
+import useLocalStorage from "./utils/useLocalStorage";
 
 const Footer = () => {
-  const [loggedIn, setLoggedIn] = React.useState<boolean>(
-    localStorage.getItem("jwt-token") !== null
-  );
+  const { isLoggedIn, setJwtToken } = useContext(SettingsContext);
   let history = useHistory();
   const handleLogOut = () => {
-    logOut();
-    setLoggedIn(false);
+    setJwtToken(null);
     history.replace("/");
   };
 
@@ -57,7 +55,7 @@ const Footer = () => {
                   Link to REST API
                 </a>
               </li>
-              {loggedIn ? (
+              {isLoggedIn() ? (
                 <li>
                   <button onClick={handleLogOut}>Wyloguj</button>
                 </li>

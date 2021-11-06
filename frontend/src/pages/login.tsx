@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Formik, Field, Form } from "formik";
 import instance from "../api/api";
 import { Token } from "../api/models/Token";
 import { useHistory, useLocation } from "react-router-dom";
+import SettingsContext from "../components/utils/settingsContext";
 
 const Login = () => {
   const [message, setMessage] = useState<string>("");
+  const {setJwtToken} = useContext(SettingsContext)
   let history = useHistory();
   let location = useLocation();
   // @ts-ignore
@@ -33,7 +35,8 @@ const Login = () => {
               },
             })
             .then((res) => {
-              localStorage.setItem("jwt-token", JSON.stringify(res.data));
+              const tokenToSave = JSON.stringify(res.data)
+              setJwtToken(tokenToSave)
               history.replace(from);
             })
             .catch((error) => setMessage(JSON.stringify(error.message)));

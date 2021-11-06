@@ -1,11 +1,8 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-interface Props {
-  children: React.ReactChild | React.ReactChild[];
-}
 
-const Layout = ({ children }: Props) => {
+const Layout = (props: {children: React.ReactNode}) => {
+  const {children} = props
   return <div className="layout">{children}</div>;
 };
 

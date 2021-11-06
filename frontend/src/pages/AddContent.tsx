@@ -18,7 +18,7 @@ const AutoSaveToken = () => {
   return null;
 };
 
-function MyEditor() {
+const AddContent = () => {
   const [message, setMessage] = React.useState<string>("");
   const [value, setValue] = React.useState(localStorage.getItem("add-form-md"));
   let history = useHistory();
@@ -40,7 +40,7 @@ function MyEditor() {
               : "",
             categories: localStorage.getItem("add-form-categories")
               ? localStorage.getItem("add-form-categories")
-              : "",
+              : ""
           }}
           onReset={async (values) => {
             values.title = "";
@@ -65,7 +65,7 @@ function MyEditor() {
                 id: values.title,
                 desc: values.description,
                 categories: values.categories,
-                content: value,
+                content: value
               })
 
               .then(() => {
@@ -106,18 +106,10 @@ function MyEditor() {
             <button type="submit">Submit</button>
             <button type="reset">Reset all</button>
 
-            <AutoSaveToken></AutoSaveToken>
+            <AutoSaveToken />
           </Form>
         </Formik>
       </div>
-    </div>
-  );
-}
-
-const AddContent = () => {
-  return (
-    <div>
-      <MyEditor></MyEditor>
     </div>
   );
 };

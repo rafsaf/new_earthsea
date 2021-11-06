@@ -1,13 +1,11 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useContext } from "react";
 import "./App.css";
 import Index from "./pages/index";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
-  Redirect,
+  Redirect
 } from "react-router-dom";
 import Login from "./pages/login";
 import AddContent from "./pages/AddContent";
@@ -15,36 +13,47 @@ import Layout from "./components/Layout";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Article from "./pages/Article";
+import SettingsContext from "./components/utils/settingsContext";
+import useLocalStorage from "./components/utils/useLocalStorage";
 
 type Props = {
-  children?: React.ReactChild | React.ReactChild[];
+  children?: React.ReactNode;
   path: string;
 };
 
-function PrivateRoute({ children, ...rest }: Props) {
-  let auth: boolean = localStorage.getItem("jwt-token") !== null;
+const PrivateRoute = ({ children, ...rest }: Props) => {
+  const { isLoggedIn } = useContext(SettingsContext);
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth ? (
+        isLoggedIn() ? (
           children
         ) : (
           <Redirect
             to={{
               pathname: "/login",
-              state: { from: location },
+              state: { from: location }
             }}
           />
         )
       }
     />
   );
-}
+};
 
-function App() {
+const App = () => {
+  const [jwtToken, setJwtToken] = useLocalStorage("jwt-token");
+
+  const isLoggedIn = () => {
+    if (jwtToken) {
+      return true;
+    }
+    return false;
+  };
+
   return (
-    <div>
+    <SettingsContext.Provider value={{ jwtToken, setJwtToken, isLoggedIn }}>
       <Router>
         <Header />
         <Layout>
@@ -65,8 +74,8 @@ function App() {
         </Layout>
         <Footer />
       </Router>
-    </div>
+    </SettingsContext.Provider>
   );
-}
+};
 
 export default App;
