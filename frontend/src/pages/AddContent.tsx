@@ -1,87 +1,94 @@
-// @ts-nocheck
 import React from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Formik, Field, Form, useFormikContext } from "formik";
 import instance from "../api/api";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { ContentBase } from "../api/models/ContentBase";
-import { ContentCreate } from "../api/models/ContentCreate";
+import useLocalStorage from "../components/utils/useLocalStorage";
 
-const AutoSaveToken = () => {
-  // Grab values and submitForm from context
-  const { values, submitForm } = useFormikContext();
+interface AutoSaveInterface {
+  setTitle: (value: string | null) => void;
+  setDescription: (value: string | null) => void;
+  setCategories: (value: string | null) => void;
+}
+
+const AutoSyncLocalStorage = (props: AutoSaveInterface) => {
+  const { setTitle, setCategories, setDescription } = props;
+  const { values } = useFormikContext<{
+    title: string;
+    categories: string;
+    description: string;
+  }>();
   React.useEffect(() => {
-    // Submit the form imperatively as an effect as soon as form values.token are 6 digits long
-    localStorage.setItem("add-form-title", values.title);
-    localStorage.setItem("add-form-categories", values.categories);
-  }, [values, submitForm]);
+    setTitle(values.title);
+  }, [values.title, setTitle]);
+  React.useEffect(() => {
+    setDescription(values.description);
+  }, [values.description, setDescription]);
+  React.useEffect(() => {
+    setCategories(values.categories);
+  }, [values.categories, setCategories]);
   return null;
 };
 
 const AddContent = () => {
   const [message, setMessage] = React.useState<string>("");
-  const [value, setValue] = React.useState(localStorage.getItem("add-form-md"));
+  const [text, setText] = useLocalStorage("add-form-md", "");
+  const [title, setTitle] = useLocalStorage("add-form-title", "");
+  const [description, setDescription] = useLocalStorage(
+    "add-form-description",
+    ""
+  );
+  const [categories, setCategories] = useLocalStorage(
+    "add-form-categories",
+    ""
+  );
   let history = useHistory();
 
-  React.useEffect(() => {
-    localStorage.setItem("add-form-md", value);
-  }, [value]);
+  const handleTextChange = (value?: string) => {
+    if (value) {
+      setText(value);
+    }
+  };
 
   return (
     <div>
       <div>
         <Formik
           initialValues={{
-            title: localStorage.getItem("add-form-title")
-              ? localStorage.getItem("add-form-title")
-              : "",
-            description: localStorage.getItem("add-form-description")
-              ? localStorage.getItem("add-form-description")
-              : "",
-            categories: localStorage.getItem("add-form-categories")
-              ? localStorage.getItem("add-form-categories")
-              : ""
+            title: title,
+            description: description,
+            categories: categories
           }}
           onReset={async (values) => {
             values.title = "";
             values.categories = "";
             values.description = "";
-
-            setValue("");
+            setText("");
+            setMessage("");
           }}
-          onSubmit={async (values, { resetForm }) => {
+          onSubmit={(values, { resetForm }) => {
             if (values.title === "" || values.categories === "") {
               setMessage("Fields cannot be empty");
               return;
             }
-            localStorage.removeItem("add-form-title");
-            localStorage.removeItem("add-form-description");
-            localStorage.removeItem("add-form-categories");
-            localStorage.removeItem("add-form-md");
 
-            let successCreate;
-            await instance
+            instance
               .post<ContentBase>("/content/", {
                 id: values.title,
                 desc: values.description,
                 categories: values.categories,
-                content: value
+                content: text
               })
-
               .then(() => {
-                successCreate = true;
+                resetForm();
+              })
+              .then(() => {
+                history.replace("/");
               })
               .catch((error) => {
                 setMessage(JSON.stringify(error.message));
-                successCreate = false;
               });
-
-            if (successCreate) {
-              resetForm();
-              setMessage("");
-              setValue("");
-              history.replace("/");
-            }
           }}
         >
           <Form>
@@ -101,12 +108,21 @@ const AddContent = () => {
             <Field id="categories" name="categories" placeholder="categories" />
             <br />
             <br />
-            <MDEditor height={500} value={value} onChange={setValue} />
+
+            <MDEditor
+              height={500}
+              value={text ? text : ""}
+              onChange={handleTextChange}
+            />
             <div style={{ padding: "20px 0 0 0" }} />
             <button type="submit">Submit</button>
             <button type="reset">Reset all</button>
 
-            <AutoSaveToken />
+            <AutoSyncLocalStorage
+              setCategories={setCategories}
+              setDescription={setDescription}
+              setTitle={setTitle}
+            />
           </Form>
         </Formik>
       </div>

@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import Article from "./pages/Article";
 import SettingsContext from "./components/utils/settingsContext";
 import useLocalStorage from "./components/utils/useLocalStorage";
+import { QueryParamProvider } from "use-query-params";
 
 type Props = {
   children?: React.ReactNode;
@@ -55,24 +56,26 @@ const App = () => {
   return (
     <SettingsContext.Provider value={{ jwtToken, setJwtToken, isLoggedIn }}>
       <Router>
-        <Header />
-        <Layout>
-          <Switch>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/-/:title">
-              <Article />
-            </Route>
-            <PrivateRoute path="/add">
-              <AddContent />
-            </PrivateRoute>
-            <Route path="/">
-              <Index />
-            </Route>
-          </Switch>
-        </Layout>
-        <Footer />
+        <QueryParamProvider ReactRouterRoute={Route}>
+          <Header />
+          <Layout>
+            <Switch>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <Route path="/-/:title">
+                <Article />
+              </Route>
+              <PrivateRoute path="/add">
+                <AddContent />
+              </PrivateRoute>
+              <Route path="/">
+                <Index />
+              </Route>
+            </Switch>
+          </Layout>
+          <Footer />
+        </QueryParamProvider>
       </Router>
     </SettingsContext.Provider>
   );

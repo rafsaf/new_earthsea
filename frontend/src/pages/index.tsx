@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import instance from "../api/api";
 import { ContentShort } from "../api/models/ContentShort";
+import { useQueryParam, StringParam, withDefault } from "use-query-params";
 
 const Index = () => {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useQueryParam("q", withDefault(StringParam, ""));
   const [articles, setArticles] = useState<ContentShort[]>([]);
   const [count, setCount] = useState<string>("0");
   const [message, setMessage] = useState<string>("");
-  const [offset, setOffset] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(50);
+  const [offset] = useState<number>(0);
+  const [limit] = useState<number>(50);
 
   const onChangeHandle = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
@@ -33,12 +34,16 @@ const Index = () => {
       <div>{message}</div>
 
       <div className="input-group">
-        <input onChange={onChangeHandle} className="index-input" />
+        <input
+          value={input}
+          onChange={onChangeHandle}
+          className="index-input"
+        />
 
         <h4 className="total-count">Liczba wyników: {count}</h4>
       </div>
       {articles.map((article) => (
-        <div id={article.id}>
+        <div key={article.id}>
           <h2>
             <Link to={`/-/${article.id}`}>{article.id}</Link>
           </h2>

@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { BASE_API_URL } from "../api/api";
 import SettingsContext from "./utils/settingsContext";
-import useLocalStorage from "./utils/useLocalStorage";
 
 const Footer = () => {
   const { isLoggedIn, setJwtToken } = useContext(SettingsContext);

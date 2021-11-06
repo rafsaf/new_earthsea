@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React from "react";
 
 interface SettingsTypes {
   jwtToken: string | null;
@@ -12,6 +12,7 @@ const defaultSettingsState: SettingsTypes = {
   isLoggedIn: () => false
 };
 
-const SettingsContext = createContext<SettingsTypes>(defaultSettingsState);
+const SettingsContext =
+  React.createContext<SettingsTypes>(defaultSettingsState);
 
 export default SettingsContext;

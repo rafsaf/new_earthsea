@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import instance from "../api/api";
-import { Token } from "../api/models/Token";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ContentBase } from "../api/models/ContentBase";
 import MDEditor from "@uiw/react-md-editor";
-import useLocalStorage from "../components/utils/useLocalStorage";
 import SettingsContext from "../components/utils/settingsContext";
 
 const Article = () => {
